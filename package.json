@@ -1,0 +1,39 @@
+{
+	"name": "@echogarden/wave-codec",
+	"version": "0.1.0",
+	"description": "A fully-featured WAVE format encoder and decoder written in pure TypeScript.",
+	"author": "Rotem Dan",
+	"license": "MIT",
+	"keywords": [
+		"WAVE",
+		"Audio",
+		"WAVE encoder",
+		"WAVE decoder"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/echogarden-project/wave-codec"
+	},
+	"bugs": {
+		"url": "https://github.com/echogarden-project/wave-codec/issues"
+	},
+	"main": "./dist/WaveCodec.js",
+	"type": "module",
+	"files": [
+		"dist",
+		"src",
+		"tsconfig.json",
+		"LICENSE.md",
+		"README.md"
+	],
+	"scripts": {
+		"test": "node dist/Test.js"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@types/node": "^22.8.6"
+	}
+}
