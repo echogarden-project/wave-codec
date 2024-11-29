@@ -2,7 +2,7 @@ import { readUint32LE, writeAscii, writeUint32LE } from './utilities/BinaryUtili
 import { concatUint8Arrays, RawAudio } from './utilities/Utilities.js'
 import { decodeAscii } from './encodings/Ascii.js'
 import { WaveFormatHeader, BitDepth, SampleFormat } from './WaveFormatHeader.js'
-import { bufferToFloat32Channels, float32ChannelsToBuffer } from './utilities/AudioBufferConversion.js'
+import { bufferToFloat32Channels, float32ChannelsToBuffer } from './audio-utilities/AudioBufferConversion.js'
 
 export function encodeWaveFromFloat32Channels(
 	audioChannels: Float32Array[],
@@ -13,7 +13,7 @@ export function encodeWaveFromFloat32Channels(
 
 	const audioDataBuffer = float32ChannelsToBuffer(audioChannels, bitDepth, sampleFormat)
 
-	const resultWaveBuffer = encodeWaveFromDataBuffer(
+	const resultWaveBuffer = encodeWaveFromBuffer(
 		audioDataBuffer,
 		sampleRate,
 		audioChannels.length,
@@ -24,13 +24,13 @@ export function encodeWaveFromFloat32Channels(
 	return resultWaveBuffer
 }
 
-export function encodeWaveFromDataBuffer(
-	audioDataBuffer: Uint8Array,
+export function encodeWaveFromBuffer(
+	audioBuffer: Uint8Array,
 	sampleRate: number,
 	channelCount: number,
 	bitDepth: BitDepth,
 	sampleFormat: SampleFormat,
-	speakerPositionMask: number) {
+	speakerPositionMask: number = 0) {
 
 	// Create format subchunk
 	const shouldUseExtensibleFormat = bitDepth > 16 || channelCount > 2
@@ -39,12 +39,12 @@ export function encodeWaveFromDataBuffer(
 	const formatSubChunkBuffer = formatSubChunk.serialize(shouldUseExtensibleFormat)
 
 	// Create data subchunk
-	const audioDataLength = audioDataBuffer.length
+	const audioBufferLength = audioBuffer.length
 
-	const dataSubChunkBuffer = new Uint8Array(4 + 4 + audioDataLength)
+	const dataSubChunkBuffer = new Uint8Array(4 + 4 + audioBufferLength)
 	writeAscii(dataSubChunkBuffer, 'data', 0)
 
-	let dataChunkLength = audioDataLength
+	let dataChunkLength = audioBufferLength
 
 	// Ensure large data chunk length is clipped to the maximum of 4294967295 bytes
 	if (dataChunkLength > 4294967295) {
@@ -53,7 +53,7 @@ export function encodeWaveFromDataBuffer(
 
 	writeUint32LE(dataSubChunkBuffer, dataChunkLength, 4)
 
-	dataSubChunkBuffer.set(audioDataBuffer, 8)
+	dataSubChunkBuffer.set(audioBuffer, 8)
 
 	// Create RIFF subchunk
 	const riffChunkHeaderBuffer = new Uint8Array(12)
@@ -87,7 +87,7 @@ export function decodeWaveToFloat32Channels(
 		bitDepth,
 		sampleFormat,
 		speakerPositionMask
-	} = decodeWaveToDataBuffer(waveData, ignoreTruncatedChunks, ignoreOverflowingDataChunks)
+	} = decodeWaveToBuffer(waveData, ignoreTruncatedChunks, ignoreOverflowingDataChunks)
 
 	const audioChannels = bufferToFloat32Channels(
 		decodedAudioBuffer,
@@ -101,7 +101,7 @@ export function decodeWaveToFloat32Channels(
 	} as RawAudio
 }
 
-export function decodeWaveToDataBuffer(
+export function decodeWaveToBuffer(
 	waveData: Uint8Array,
 	ignoreTruncatedChunks = true,
 	ignoreOverflowingDataChunks = true) {
@@ -202,10 +202,10 @@ export function decodeWaveToDataBuffer(
 
 	// Note: the returned audio buffer must be ensured to be
 	// memory aligned to the target bit depth, like 2 bytes or 4 bytes for 16 and 32 bits.
-	const decodedAudioDataBuffer = concatUint8Arrays(dataBuffers)
+	const decodedAudioBuffer = concatUint8Arrays(dataBuffers)
 
 	return {
-		decodedAudioBuffer: decodedAudioDataBuffer,
+		decodedAudioBuffer,
 		sampleRate,
 		channelCount,
 		bitDepth,
@@ -214,7 +214,7 @@ export function decodeWaveToDataBuffer(
 	}
 }
 
-export function repairWaveBuffer(waveData: Uint8Array) {
+export function repairWaveData(waveData: Uint8Array) {
 	const {
 		decodedAudioBuffer,
 		sampleRate,
@@ -222,9 +222,9 @@ export function repairWaveBuffer(waveData: Uint8Array) {
 		bitDepth,
 		sampleFormat,
 		speakerPositionMask
-	} = decodeWaveToDataBuffer(waveData, true, true)
+	} = decodeWaveToBuffer(waveData, true, true)
 
-	const reencodedWaveData = encodeWaveFromDataBuffer(
+	const reEncodedWaveData = encodeWaveFromBuffer(
 		decodedAudioBuffer,
 		sampleRate,
 		channelCount,
@@ -232,9 +232,9 @@ export function repairWaveBuffer(waveData: Uint8Array) {
 		sampleFormat,
 		speakerPositionMask)
 
-	return reencodedWaveData
+	return reEncodedWaveData
 }
 
-export { float32ChannelsToBuffer, bufferToFloat32Channels } from './utilities/AudioBufferConversion.js'
+export { float32ChannelsToBuffer, bufferToFloat32Channels } from './audio-utilities/AudioBufferConversion.js'
 
 export { type BitDepth, type SampleFormat } from './WaveFormatHeader.js'

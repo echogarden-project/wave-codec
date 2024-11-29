@@ -1,7 +1,7 @@
 import { encodeAlaw, decodeAlaw } from '../codecs/Alaw.js'
 import { encodeMulaw, decodeMulaw } from '../codecs/Mulaw.js'
 
-import * as BinaryArrayConversion from './BinaryArrayConversion.js'
+import * as BinaryArrayConversion from '../utilities/BinaryArrayConversion.js'
 import { BitDepth, SampleFormat } from '../WaveFormatHeader.js'
 
 /////////////////////////////////////////////////////////////////////////////////////////////
