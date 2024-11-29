@@ -1,7 +1,7 @@
 {
 	"name": "@echogarden/wave-codec",
-	"version": "0.1.0",
-	"description": "A fully-featured WAVE format encoder and decoder written in pure TypeScript.",
+	"version": "0.2.0",
+	"description": "A fully-featured WAVE format encoder and decoder. Written in pure TypeScript.",
 	"author": "Rotem Dan",
 	"license": "MIT",
 	"keywords": [
