@@ -14,7 +14,7 @@ export function float32ChannelsToBuffer(audioChannels: Float32Array[], targetBit
 
 	if (targetSampleFormat === SampleFormat.PCM) {
 		if (targetBitDepth === 8) {
-			return BinaryArrayConversion.int8ToBytes(float32ToInt8Pcm(interleavedChannels))
+			return float32ToUint8Pcm(interleavedChannels)
 		} else if (targetBitDepth === 16) {
 			return BinaryArrayConversion.int16ToBytesLE(float32ToInt16Pcm(interleavedChannels))
 		} else if (targetBitDepth === 24) {
@@ -54,7 +54,7 @@ export function bufferToFloat32Channels(audioBuffer: Uint8Array, channelCount: n
 
 	if (sourceSampleFormat === SampleFormat.PCM) {
 		if (sourceBitDepth === 8) {
-			interleavedChannels = int8PcmToFloat32(BinaryArrayConversion.bytesToInt8(audioBuffer))
+			interleavedChannels = uint8PcmToFloat32(audioBuffer)
 		} else if (sourceBitDepth === 16) {
 			interleavedChannels = int16PcmToFloat32(BinaryArrayConversion.bytesLEToInt16(audioBuffer))
 		} else if (sourceBitDepth === 24) {
@@ -94,35 +94,35 @@ export function bufferToFloat32Channels(audioBuffer: Uint8Array, channelCount: n
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// Int8 PCM <-> Float32 PCM conversion
+// Uint8 PCM <-> Float32 PCM conversion
 /////////////////////////////////////////////////////////////////////////////////////////////
-export function int8PcmToFloat32(input: Int8Array) {
+export function uint8PcmToFloat32(input: Uint8Array) {
 	const sampleCount = input.length
 
 	const output = new Float32Array(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		output[i] = input[i] / 128
+		output[i] = (input[i] - 128) / 128
 	}
 
 	return output
 }
 
-export function float32ToInt8Pcm(input: Float32Array) {
+export function float32ToUint8Pcm(input: Float32Array) {
 	const sampleCount = input.length
 
-	const output = new Int8Array(sampleCount)
+	const output = new Uint8Array(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		const int8Sample = input[i] * 128
+		let int8Sample = input[i] * 128
 
 		if (int8Sample < -128) {
-			output[i] = -128
+			int8Sample = -128
 		} else if (int8Sample > 127) {
-			output[i] = 127
-		} else {
-			output[i] = int8Sample
+			int8Sample = 127
 		}
+
+		output[i] = int8Sample + 128
 	}
 
 	return output
