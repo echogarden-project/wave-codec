@@ -2,7 +2,7 @@
 
 Fully-featured encoder and decoder for the standard WAVE format.
 * Written in pure TypeScript
-* Supports all sample formats and bit-depths included in the WAVE standard, including GUID-based sub-formats for PCM and Float sample formats, and the 8-bit A-law and Mu-law codecs
+* Supports all sample formats and bit-depths included in the core WAVE standard, including GUID-based sub-formats for PCM and Float sample formats, and the 8-bit A-law and Mu-law codecs
 * Ignores unsupported or unknown sub-chunks like `LIST`, `fact`, `plst` and `junk`
 * Supports reading and writing WAVE buffers larger than 4 GiB, by interpreting a chunk of length 2^32 - 1 to extend up to the end of the buffer (even if it's much larger). This is compatible with FFMpeg's input and output approach for long or streaming WAVE data
 * Runs on Node.js, Deno, Bun, browsers
