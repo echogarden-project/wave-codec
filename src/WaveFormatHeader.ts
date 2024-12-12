@@ -86,6 +86,10 @@ export class WaveFormatHeader { // 24 bytes total for PCM, 26 for float
 				sampleFormat = SampleFormat.PCM
 			} else if (guid === sampleFormatToGuid[SampleFormat.Float]) {
 				sampleFormat = SampleFormat.Float
+			} else if (guid === sampleFormatToGuid[SampleFormat.Alaw]) {
+				sampleFormat = SampleFormat.Alaw
+			} else if (guid === sampleFormatToGuid[SampleFormat.Mulaw]) {
+				sampleFormat = SampleFormat.Mulaw
 			} else {
 				throw new Error(`Unsupported format GUID in extended format subchunk: ${guid}`)
 			}
@@ -135,6 +139,6 @@ const sampleFormatToSerializedSize = {
 const sampleFormatToGuid = {
 	[SampleFormat.PCM]: '0100000000001000800000aa00389b71',
 	[SampleFormat.Float]: '0300000000001000800000aa00389b71',
-	[SampleFormat.Alaw]: '',
-	[SampleFormat.Mulaw]: '',
+	[SampleFormat.Alaw]: '0600000000001000800000aa00389b71',
+	[SampleFormat.Mulaw]: '0700000000001000800000aa00389b71',
 }
