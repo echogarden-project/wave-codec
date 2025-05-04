@@ -1,5 +1,5 @@
 import { readUint32LE, writeAscii, writeUint32LE } from './utilities/BinaryUtilities.js'
-import { concatUint8Arrays, RawAudio } from './utilities/Utilities.js'
+import { concatUint8Arrays } from './utilities/Utilities.js'
 import { decodeAscii } from './encodings/Ascii.js'
 import { WaveFormatHeader, BitDepth, SampleFormat } from './WaveFormatHeader.js'
 import { bufferToFloat32Channels, float32ChannelsToBuffer } from './audio-utilities/AudioBufferConversion.js'
@@ -172,7 +172,7 @@ export function decodeWaveToBuffer(
 			dataBuffers.push(subChunkData)
 		}
 
-		// All sub chunks other than 'data' (e.g. 'LIST', 'fact', 'plst', 'junk' etc.) are ignored
+		// All sub chunks other than 'fmt ' and 'data' (e.g. 'LIST', 'fact', 'plst', 'junk' etc.) are ignored
 
 		// This addition operation may overflow if JavaScript integers were 32 bits,
 		// but since they are 52 bits, it is okay:
@@ -238,3 +238,8 @@ export function repairWaveData(waveData: Uint8Array) {
 export { float32ChannelsToBuffer, bufferToFloat32Channels } from './audio-utilities/AudioBufferConversion.js'
 
 export { type BitDepth, type SampleFormat } from './WaveFormatHeader.js'
+
+export type RawAudio = {
+	audioChannels: Float32Array[]
+	sampleRate: number
+}
