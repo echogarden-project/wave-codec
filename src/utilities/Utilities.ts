@@ -28,7 +28,14 @@ function concatTypedArrays<T extends TypedArray>(TypedArrayConstructor: TypedArr
 	return result as T
 }
 
-export type RawAudio = {
-	audioChannels: Float32Array[]
-	sampleRate: number
+export function clip(num: number, min: number, max: number) {
+	if (num < min) {
+		return min
+	}
+
+	if (num > max) {
+		return max
+	}
+
+	return num
 }

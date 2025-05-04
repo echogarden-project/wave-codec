@@ -3,6 +3,7 @@ import { encodeMulaw, decodeMulaw } from '../codecs/Mulaw.js'
 
 import * as BinaryArrayConversion from '../utilities/BinaryArrayConversion.js'
 import { BitDepth, SampleFormat } from '../WaveFormatHeader.js'
+import { clip } from '../utilities/Utilities.js'
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Audio conversions to and from float32 PCM
@@ -90,7 +91,7 @@ export function bufferToFloat32Channels(audioBuffer: Uint8Array, channelCount: n
 
 	audioBuffer = new Uint8Array(0) // Zero the reference to allow the GC to free up memory, if possible
 
-	return deInterleaveChannels(interleavedChannels, channelCount)
+	return deinterleaveChannels(interleavedChannels, channelCount)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,13 +115,9 @@ export function float32ToUint8Pcm(input: Float32Array) {
 	const output = new Uint8Array(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		let int8Sample = input[i] * 128
+		let int8Sample = Math.round(input[i] * 128)
 
-		if (int8Sample < -128) {
-			int8Sample = -128
-		} else if (int8Sample > 127) {
-			int8Sample = 127
-		}
+		int8Sample = clip(int8Sample, -128, 127)
 
 		output[i] = int8Sample + 128
 	}
@@ -149,15 +146,11 @@ export function float32ToInt16Pcm(input: Float32Array) {
 	const output = new Int16Array(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		const int16Sample = input[i] * 32768
+		let int16Sample = Math.round(input[i] * 32768)
 
-		if (int16Sample < -32768) {
-			output[i] = -32768
-		} else if (int16Sample > 32767) {
-			output[i] = 32767
-		} else {
-			output[i] = int16Sample
-		}
+		int16Sample = clip(int16Sample, -32768, 32767)
+
+		output[i] = int16Sample
 	}
 
 	return output
@@ -184,15 +177,11 @@ export function float32ToInt24Pcm(input: Float32Array) {
 	const output = new Int32Array(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		const int24Sample = input[i] * 8388608
+		let int24Sample = Math.round(input[i] * 8388608)
 
-		if (int24Sample < -8388608) {
-			output[i] = -8388608
-		} else if (int24Sample > 8388607) {
-			output[i] = 8388607
-		} else {
-			output[i] = int24Sample
-		}
+		int24Sample = clip(int24Sample, -8388608, 8388607)
+
+		output[i] = int24Sample
 	}
 
 	return output
@@ -218,15 +207,11 @@ export function float32ToInt32Pcm(input: Float32Array) {
 	const output = new Int32Array(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		const int32Sample = input[i] * 2147483648
+		let int32Sample = Math.round(input[i] * 2147483648)
 
-		if (int32Sample < -2147483648) {
-			output[i] = -2147483648
-		} else if (int32Sample > 2147483647) {
-			output[i] = 2147483647
-		} else {
-			output[i] = int32Sample
-		}
+		int32Sample = clip(int32Sample, -2147483648, 2147483647)
+
+		output[i] = int32Sample
 	}
 
 	return output
@@ -260,7 +245,7 @@ export function interleaveChannels(channels: Float32Array[]) {
 	return result
 }
 
-export function deInterleaveChannels(interleavedChannels: Float32Array, channelCount: number) {
+export function deinterleaveChannels(interleavedChannels: Float32Array, channelCount: number) {
 	if (channelCount === 0) {
 		throw new Error('0 channel count received')
 	}
