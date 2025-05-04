@@ -237,7 +237,7 @@ export function repairWaveData(waveData: Uint8Array) {
 
 export { float32ChannelsToBuffer, bufferToFloat32Channels } from './audio-utilities/AudioBufferConversion.js'
 
-export { type BitDepth, type SampleFormat } from './WaveFormatHeader.js'
+export { type BitDepth, SampleFormat } from './WaveFormatHeader.js'
 
 export type RawAudio = {
 	audioChannels: Float32Array[]
