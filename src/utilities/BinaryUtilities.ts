@@ -4,27 +4,11 @@
 export function readInt8(buffer: Uint8Array, offset: number) {
 	const unsignedValue = buffer[offset]
 
-	if (unsignedValue < 128) {
-		return unsignedValue
-	} else {
-		return unsignedValue - 256
-	}
+	return (unsignedValue << 24) >> 24
 }
 
 export function writeInt8(buffer: Uint8Array, value: number, offset: number) {
-	if (value < -128 || value > 127) {
-		throw new Error(`Value ${value} is outside the range of an 8-bit signed integer`)
-	}
-
-	let unsignedValue: number
-
-	if (value >= 0) {
-		unsignedValue = value
-	} else {
-		unsignedValue = value + 256
-	}
-
-	buffer[offset] = unsignedValue
+	writeUint8(buffer, value, offset)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,10 +19,6 @@ export function readUint8(buffer: Uint8Array, offset: number) {
 }
 
 export function writeUint8(buffer: Uint8Array, value: number, offset: number) {
-	if (value < 0 || value > 255) {
-		throw new Error(`Value ${value} is outside the range of an 8-bit unsigned integer`)
-	}
-
 	buffer[offset] = value
 }
 
@@ -48,51 +28,31 @@ export function writeUint8(buffer: Uint8Array, value: number, offset: number) {
 export function readInt16LE(buffer: Uint8Array, offset: number) {
 	const unsignedValue = readUint16LE(buffer, offset)
 
-	if (unsignedValue < 32768) {
-		return unsignedValue
-	} else {
-		return unsignedValue - 65536
-	}
+	return (unsignedValue << 16) >> 16
 }
 
 export function writeInt16LE(buffer: Uint8Array, value: number, offset: number) {
-	if (value < -32768 || value > 32767) {
-		throw new Error(`Value ${value} is outside the range of a 16-bit signed integer`)
-	}
-
-	let unsignedValue: number
-
-	if (value >= 0) {
-		unsignedValue = value
-	} else {
-		unsignedValue = value + 65536
-	}
-
-	writeUint16LE(buffer, unsignedValue, offset)
+	writeUint16LE(buffer, value, offset)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 // Uint16LE
 ///////////////////////////////////////////////////////////////////////////////////////////////
 export function readUint16LE(buffer: Uint8Array, offset: number) {
-	return (buffer[offset]) | (buffer[offset + 1] << 8)
+	return (buffer[offset + 0]) | (buffer[offset + 1] << 8)
 }
 
 export function writeUint16LE(buffer: Uint8Array, value: number, offset: number) {
-	if (value < 0 || value > 65535) {
-		throw new Error(`Value ${value} is outside the range of a 16-bit unsigned integer`)
-	}
-
-	buffer[offset] = value & 0xff
-	buffer[offset + 1] = (value >>> 8) & 0xff
+	buffer[offset + 0] = value
+	buffer[offset + 1] = value >>> 8
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
-// Int16LE
+// Int32LE
 ///////////////////////////////////////////////////////////////////////////////////////////////
 export function readInt32LE(buffer: Uint8Array, offset: number) {
 	const value =
-		(buffer[offset]) |
+		(buffer[offset + 0]) |
 		(buffer[offset + 1] << 8) |
 		(buffer[offset + 2] << 16) |
 		(buffer[offset + 3] << 24)
@@ -101,14 +61,7 @@ export function readInt32LE(buffer: Uint8Array, offset: number) {
 }
 
 export function writeInt32LE(buffer: Uint8Array, value: number, offset: number) {
-	if (value < -2147483648 || value > 2147483647) {
-		throw new Error(`Value ${value} is outside the range of a 32-bit signed integer`)
-	}
-
-	buffer[offset] = value & 0xff
-	buffer[offset + 1] = (value >> 8) & 0xff
-	buffer[offset + 2] = (value >> 16) & 0xff
-	buffer[offset + 3] = (value >> 24) & 0xff
+	writeUint32LE(buffer, value, offset)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,14 +72,10 @@ export function readUint32LE(buffer: Uint8Array, offset: number) {
 }
 
 export function writeUint32LE(buffer: Uint8Array, value: number, offset: number) {
-	if (value < 0 || value > 4294967295) {
-		throw new Error(`Value ${value} is outside the range of a 32-bit unsigned integer`)
-	}
-
-	buffer[offset] = value & 0xff
-	buffer[offset + 1] = (value >>> 8) & 0xff
-	buffer[offset + 2] = (value >>> 16) & 0xff
-	buffer[offset + 3] = (value >>> 24) & 0xff
+	buffer[offset + 0] = value
+	buffer[offset + 1] = value >>> 8
+	buffer[offset + 2] = value >>> 16
+	buffer[offset + 3] = value >>> 24
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -147,48 +96,4 @@ export function writeAscii(buffer: Uint8Array, asciiString: string, writeStartOf
 
 		buffer[writeOffset++] = charCode
 	}
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-// Endianess
-///////////////////////////////////////////////////////////////////////////////////////////////
-export function reverseByteGroupsIfBigEndian(bytes: Uint8Array, groupSize: number) {
-	if (isBigEndianArch()) {
-		return reverseByteGroups(bytes, groupSize)
-	} else {
-		return bytes
-	}
-}
-
-export function reverseByteGroups(bytes: Uint8Array, groupSize: number) {
-	if (bytes.length % groupSize !== 0) {
-		throw new Error(`Byte count must be an integer multiple of the group size.`)
-	}
-
-	const groupEnd = groupSize - 1
-
-	const result = new Uint8Array(bytes.length)
-	let offset = 0
-
-	while (offset < bytes.length) {
-		for (let i = 0; i < groupSize; i++) {
-			result[offset + i] = bytes[offset + (groupEnd - i)]
-		}
-
-		offset += groupSize
-	}
-
-	return result
-}
-
-let isBigEndianArch_cached: boolean | undefined
-export function isBigEndianArch() {
-	if (isBigEndianArch_cached === undefined) {
-		const uint16Array = new Uint16Array([0x11_22])
-		const byteView = new Uint8Array(uint16Array.buffer)
-
-		isBigEndianArch_cached = byteView[0] === 0x11
-	}
-
-	return isBigEndianArch_cached
 }
