@@ -1,4 +1,4 @@
-import { reverseByteGroupsIfBigEndian } from "./BinaryUtilities.js"
+import { reverseByteGroupsIfBigEndian } from './Endianess.js'
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // int16 <-> bytesLE
