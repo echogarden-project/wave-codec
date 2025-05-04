@@ -24,12 +24,12 @@ export function reverseByteGroupsInPlace(bytes: Uint8Array, groupSize: number) {
 	const halfGroupSize = Math.floor(groupSize / 2)
 
 	for (let offset = 0; offset < bytes.length; offset += groupSize) {
-		const groupFirstOffset = offset
-		const groupLastOffset = offset + groupSize - 1
+		const groupFirstElementOffset = offset
+		const groupLastElementOffset = offset + groupSize - 1
 
 		for (let i = 0; i < halfGroupSize; i++) {
-			const offset1 = groupFirstOffset + i
-			const offset2 = groupLastOffset - i
+			const offset1 = groupFirstElementOffset + i
+			const offset2 = groupLastElementOffset - i
 
 			// Swap pair of bytes
 			const valueAtOffset1 = bytes[offset1]

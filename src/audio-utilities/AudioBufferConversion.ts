@@ -17,19 +17,19 @@ export function float32ChannelsToBuffer(audioChannels: Float32Array[], targetBit
 		if (targetBitDepth === 8) {
 			return float32ToUint8Pcm(interleavedChannels)
 		} else if (targetBitDepth === 16) {
-			return BinaryArrayConversion.int16ToBytesLE(float32ToInt16Pcm(interleavedChannels))
+			return BinaryArrayConversion.int16ArrayToBytesLE(float32ToInt16Pcm(interleavedChannels))
 		} else if (targetBitDepth === 24) {
-			return BinaryArrayConversion.int24ToBytesLE(float32ToInt24Pcm(interleavedChannels))
+			return BinaryArrayConversion.int24ArrayToBytesLE(float32ToInt24Pcm(interleavedChannels))
 		} else if (targetBitDepth === 32) {
-			return BinaryArrayConversion.int32ToBytesLE(float32ToInt32Pcm(interleavedChannels))
+			return BinaryArrayConversion.int32ArrayToBytesLE(float32ToInt32Pcm(interleavedChannels))
 		} else {
 			throw new Error(`Unsupported PCM bit depth: ${targetBitDepth}`)
 		}
 	} else if (targetSampleFormat === SampleFormat.Float) {
 		if (targetBitDepth === 32) {
-			return BinaryArrayConversion.float32ToBytesLE(interleavedChannels)
+			return BinaryArrayConversion.float32ArrayToBytesLE(interleavedChannels)
 		} else if (targetBitDepth === 64) {
-			return BinaryArrayConversion.float64ToBytesLE(BinaryArrayConversion.float32Tofloat64(interleavedChannels))
+			return BinaryArrayConversion.float64ArrayToBytesLE(BinaryArrayConversion.float32ArrayTofloat64Array(interleavedChannels))
 		} else {
 			throw new Error(`Unsupported float bit depth: ${targetBitDepth}`)
 		}
@@ -57,19 +57,19 @@ export function bufferToFloat32Channels(audioBuffer: Uint8Array, channelCount: n
 		if (sourceBitDepth === 8) {
 			interleavedChannels = uint8PcmToFloat32(audioBuffer)
 		} else if (sourceBitDepth === 16) {
-			interleavedChannels = int16PcmToFloat32(BinaryArrayConversion.bytesLEToInt16(audioBuffer))
+			interleavedChannels = int16PcmToFloat32(BinaryArrayConversion.bytesLEToInt16Array(audioBuffer))
 		} else if (sourceBitDepth === 24) {
-			interleavedChannels = int24PcmToFloat32(BinaryArrayConversion.bytesLEToInt24(audioBuffer))
+			interleavedChannels = int24PcmToFloat32(BinaryArrayConversion.bytesLEToInt24Array(audioBuffer))
 		} else if (sourceBitDepth === 32) {
-			interleavedChannels = int32PcmToFloat32(BinaryArrayConversion.bytesLEToInt32(audioBuffer))
+			interleavedChannels = int32PcmToFloat32(BinaryArrayConversion.bytesLEToInt32Array(audioBuffer))
 		} else {
 			throw new Error(`Unsupported PCM bit depth: ${sourceBitDepth}`)
 		}
 	} else if (sourceSampleFormat === SampleFormat.Float) {
 		if (sourceBitDepth === 32) {
-			interleavedChannels = BinaryArrayConversion.bytesLEToFloat32(audioBuffer)
+			interleavedChannels = BinaryArrayConversion.bytesLEToFloat32Array(audioBuffer)
 		} else if (sourceBitDepth === 64) {
-			interleavedChannels = BinaryArrayConversion.float64Tofloat32(BinaryArrayConversion.bytesLEToFloat64(audioBuffer))
+			interleavedChannels = BinaryArrayConversion.float64ArrayTofloat32Array(BinaryArrayConversion.bytesLEToFloat64Array(audioBuffer))
 		} else {
 			throw new Error(`Unsupported float bit depth: ${sourceBitDepth}`)
 		}
@@ -246,15 +246,15 @@ export function interleaveChannels(channels: Float32Array[]) {
 }
 
 export function deinterleaveChannels(interleavedChannels: Float32Array, channelCount: number) {
-	if (channelCount === 0) {
-		throw new Error('0 channel count received')
+	if (channelCount < 1) {
+		throw new Error(`Invalid channel count of ${channelCount} received, which is smaller than 1`)
 	}
 
 	if (channelCount === 1) {
 		return [interleavedChannels]
 	}
 
-	if (interleavedChannels.length % channelCount != 0) {
+	if (interleavedChannels.length % channelCount !== 0) {
 		throw new Error(`Size of interleaved channels (${interleaveChannels.length}) is not a multiple of channel count (${channelCount})`)
 	}
 

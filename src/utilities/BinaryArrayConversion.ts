@@ -1,132 +1,119 @@
 import { reverseByteGroupsIfBigEndian } from './Endianess.js'
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// int16 <-> bytesLE
+// Int16Array <-> BytesLE
 ////////////////////////////////////////////////////////////////////////////////////////////
-export function int16ToBytesLE(int16s: Int16Array) {
+export function int16ArrayToBytesLE(int16s: Int16Array) {
 	const bytes = new Uint8Array(int16s.buffer, int16s.byteOffset, int16s.byteLength)
 
 	return reverseByteGroupsIfBigEndian(bytes, 2)
 }
 
-export function bytesLEToInt16(bytes: Uint8Array) {
+export function bytesLEToInt16Array(bytes: Uint8Array) {
 	bytes = reverseByteGroupsIfBigEndian(bytes, 2)
 
 	return new Int16Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 2)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// int24 <-> bytesLE (uses int32 for storage)
+// Int24Array <-> BytesLE (uses Int32Array for storage)
 ////////////////////////////////////////////////////////////////////////////////////////////
-export function int24ToBytesLE(int24s: Int32Array) {
+export function int24ArrayToBytesLE(int24s: Int32Array) {
 	const bytes = new Uint8Array(int24s.length * 3)
 
-	let readOffset = 0
-	let writeOffset = 0
+	for (
+		let readOffset = 0, writeOffset = 0;
+		readOffset < int24s.length;
+		readOffset += 1, writeOffset += 3) {
 
-	while (readOffset < int24s.length) {
-		const signedValue = int24s[readOffset++]
+		const value = int24s[readOffset]
 
-		let unsignedValue: number
-
-		if (signedValue >= 0) {
-			unsignedValue = signedValue
-		} else {
-			unsignedValue = signedValue + (2 ** 24)
-		}
-
-		bytes[writeOffset++] = (unsignedValue) & 0xff
-		bytes[writeOffset++] = (unsignedValue >> 8) & 0xff
-		bytes[writeOffset++] = (unsignedValue >> 16) & 0xff
+		bytes[writeOffset + 0] = value
+		bytes[writeOffset + 1] = value >>> 8
+		bytes[writeOffset + 2] = value >>> 16
 	}
 
 	return bytes
 }
 
-export function bytesLEToInt24(bytes: Uint8Array) {
+export function bytesLEToInt24Array(bytes: Uint8Array) {
 	if (bytes.length % 3 !== 0) {
 		throw new Error(`Bytes has a length of ${bytes.length}, which is not a multiple of 3`)
 	}
 
-	const result = new Int32Array(bytes.length / 3)
+	const int24s = new Int32Array(bytes.length / 3)
 
-	let readOffset = 0
-	let writeOffset = 0
+	for (
+		let readOffset = 0, writeOffset = 0;
+		readOffset < bytes.length;
+		readOffset += 3, writeOffset += 1) {
 
-	while (writeOffset < result.length) {
-		const b0 = bytes[readOffset++]
-		const b1 = bytes[readOffset++]
-		const b2 = bytes[readOffset++]
+		const unsignedValue =
+			(bytes[readOffset + 0]) |
+			(bytes[readOffset + 1] << 8) |
+			(bytes[readOffset + 2] << 16)
 
-		const unsignedValue = (b0) | (b1 << 8) | (b2 << 16)
+		const signedValue = (unsignedValue << 8) >> 8
 
-		let signedValue: number
-
-		if (unsignedValue < 2 ** 23) {
-			signedValue = unsignedValue
-		} else {
-			signedValue = unsignedValue - (2 ** 24)
-		}
-
-		result[writeOffset++] = signedValue
+		int24s[writeOffset] = signedValue
 	}
 
-	return result
+	return int24s
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// int32 <-> bytesLE
+// Int32Array <-> BytesLE
 ////////////////////////////////////////////////////////////////////////////////////////////
-export function int32ToBytesLE(int32s: Int32Array) {
+export function int32ArrayToBytesLE(int32s: Int32Array) {
 	const bytes = new Uint8Array(int32s.buffer, int32s.byteOffset, int32s.byteLength)
 
 	return reverseByteGroupsIfBigEndian(bytes, 4)
 }
 
 
-export function bytesLEToInt32(bytes: Uint8Array) {
+export function bytesLEToInt32Array(bytes: Uint8Array) {
 	bytes = reverseByteGroupsIfBigEndian(bytes, 4)
 
 	return new Int32Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 4)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// float32 <-> bytesLE
+// Float32Array <-> BytesLE
 ////////////////////////////////////////////////////////////////////////////////////////////
-export function float32ToBytesLE(float32s: Float32Array) {
+export function float32ArrayToBytesLE(float32s: Float32Array) {
 	const bytes = new Uint8Array(float32s.buffer, float32s.byteOffset, float32s.byteLength)
 
 	return reverseByteGroupsIfBigEndian(bytes, 4)
 }
 
-export function bytesLEToFloat32(bytes: Uint8Array) {
+export function bytesLEToFloat32Array(bytes: Uint8Array) {
 	bytes = reverseByteGroupsIfBigEndian(bytes, 4)
 
 	return new Float32Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 4)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// float64 <-> bytesLE
+// Float64Array <-> BytesLE
 ////////////////////////////////////////////////////////////////////////////////////////////
-export function float64ToBytesLE(float64s: Float64Array) {
+export function float64ArrayToBytesLE(float64s: Float64Array) {
 	const bytes = new Uint8Array(float64s.buffer, float64s.byteOffset, float64s.byteLength)
 
 	return reverseByteGroupsIfBigEndian(bytes, 8)
 }
 
-export function bytesLEToFloat64(bytes: Uint8Array) {
+export function bytesLEToFloat64Array(bytes: Uint8Array) {
 	bytes = reverseByteGroupsIfBigEndian(bytes, 8)
 
 	return new Float64Array(bytes.buffer, bytes.byteOffset, bytes.byteLength / 8)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-// float64 <-> float32
+// Float64Array <-> Float32Array
 ////////////////////////////////////////////////////////////////////////////////////////////
-export function float64Tofloat32(float64s: Float64Array) {
+export function float64ArrayTofloat32Array(float64s: Float64Array) {
 	return Float32Array.from(float64s)
 }
 
-export function float32Tofloat64(float32s: Float32Array) {
+export function float32ArrayTofloat64Array(float32s: Float32Array) {
 	return Float64Array.from(float32s)
 }

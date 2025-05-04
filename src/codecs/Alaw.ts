@@ -75,7 +75,7 @@ export function alawToPcmSample(aLawSample: number) {
 
 	let decoded = 0
 
-	if (position != 4) {
+	if (position !== 4) {
 		decoded = (1 << position) |
 				  ((aLawSample & 0x0f) << (position - 4)) |
 				  (1 << (position - 5))
