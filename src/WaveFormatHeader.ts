@@ -56,7 +56,7 @@ export class WaveFormatHeader { // 24 bytes total for PCM, 26 for float
 			writeUint16LE(result, this.bitDepth, 26) // + 2 (valid bits per sample)
 			writeUint32LE(result, this.speakerPositionMask, 28) // + 2 (speaker position mask)
 
-			if (this.sampleFormat === SampleFormat.PCM || this.sampleFormat === SampleFormat.Float) {
+			if (this.guid) {
 				result.set(decodeHex(this.guid), 32)
 			} else {
 				throw new Error(`Extensible format is not supported for sample format ${this.sampleFormat}`)
