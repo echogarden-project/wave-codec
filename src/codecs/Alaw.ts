@@ -34,7 +34,7 @@ export function pcmToAlawSample(pcmSample: number) {
 
 	const sign = ((~pcmSample) >> 8) & 0x80
 
-	if (sign !== 0) {
+	if (sign === 0) {
 		pcmSample = -pcmSample;
 	}
 
