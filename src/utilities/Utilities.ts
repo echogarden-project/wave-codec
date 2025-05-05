@@ -1,4 +1,4 @@
-import { TypedArray, TypedArrayConstructor } from "./TypedArray.js"
+import { TypedArray, TypedArrayConstructor } from './TypedArray.js'
 
 export function concatUint8Arrays(arrays: Uint8Array[]) {
 	return concatTypedArrays<Uint8Array>(Uint8Array, arrays)

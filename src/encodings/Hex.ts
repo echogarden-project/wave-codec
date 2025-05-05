@@ -1,4 +1,4 @@
-import { decodeAscii } from "./Ascii.js"
+import { decodeAscii } from './Ascii.js'
 
 export function encodeHex(buffer: Uint8Array) {
 	const asciiBuffer = encodeHexAsAsciiBuffer(buffer)

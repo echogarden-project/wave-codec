@@ -70,7 +70,6 @@ export function int32ArrayToBytesLE(int32s: Int32Array) {
 	return reverseByteGroupsIfBigEndian(bytes, 4)
 }
 
-
 export function bytesLEToInt32Array(bytes: Uint8Array) {
 	bytes = reverseByteGroupsIfBigEndian(bytes, 4)
 
