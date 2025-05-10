@@ -103,7 +103,7 @@ export function uint8PcmToFloat32(input: Uint8Array) {
 	const output = new Float32Array(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		output[i] = (input[i] - 128) / 128
+		output[i] = (input[i] - 128) * (1 / 128)
 	}
 
 	return output
@@ -134,7 +134,7 @@ export function int16PcmToFloat32(input: Int16Array) {
 	const output = new Float32Array(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		output[i] = input[i] / 32768
+		output[i] = input[i] * (1 / 32768)
 	}
 
 	return output
@@ -165,7 +165,7 @@ export function int24PcmToFloat32(input: Int32Array) {
 	const output = new Float32Array(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		output[i] = input[i] / 8388608
+		output[i] = input[i] * (1 / 8388608)
 	}
 
 	return output
@@ -195,7 +195,7 @@ export function int32PcmToFloat32(input: Int32Array) {
 	const output = new Float32Array(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		output[i] = input[i] / 2147483648
+		output[i] = input[i] * (1 / 2147483648)
 	}
 
 	return output
