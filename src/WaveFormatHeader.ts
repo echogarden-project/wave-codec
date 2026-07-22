@@ -54,7 +54,7 @@ export class WaveFormatHeader { // 24 bytes total for PCM, 26 for float
 		if (useExtensibleFormat) {
 			writeUint16LE(result, serializedSize - 26, 24) // + 2 (extension size)
 			writeUint16LE(result, this.bitDepth, 26) // + 2 (valid bits per sample)
-			writeUint32LE(result, this.speakerPositionMask, 28) // + 2 (speaker position mask)
+			writeUint32LE(result, this.speakerPositionMask, 28) // + 4 (speaker position mask)
 
 			if (this.guid) {
 				result.set(decodeHex(this.guid), 32)
@@ -70,7 +70,7 @@ export class WaveFormatHeader { // 24 bytes total for PCM, 26 for float
 		let sampleFormat = readUint16LE(formatChunkBody, 0) // + 2
 		const channelCount = readUint16LE(formatChunkBody, 2) // + 2
 		const sampleRate = readUint32LE(formatChunkBody, 4) // + 4
-		const bitDepth = readUint16LE(formatChunkBody, 14)
+		const bitDepth = readUint16LE(formatChunkBody, 14) // + 2
 		let speakerPositionMask = 0
 
 		if (sampleFormat === 65534) {
@@ -78,9 +78,9 @@ export class WaveFormatHeader { // 24 bytes total for PCM, 26 for float
 				throw new Error(`Format subchunk specifies a format id of 65534 (extensible) but its body size is ${formatChunkBody.length} bytes, which is smaller than the minimum expected of 40 bytes`)
 			}
 
-			speakerPositionMask = readUint16LE(formatChunkBody, 20)
+			speakerPositionMask = readUint32LE(formatChunkBody, 20) // + 4
 
-			const guid = encodeHex(formatChunkBody.subarray(24, 40))
+			const guid = encodeHex(formatChunkBody.subarray(24, 40)) // + 16
 
 			if (guid === sampleFormatToGuid[SampleFormat.PCM]) {
 				sampleFormat = SampleFormat.PCM
