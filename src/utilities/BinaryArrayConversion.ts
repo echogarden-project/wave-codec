@@ -109,10 +109,10 @@ export function bytesLEToFloat64Array(bytes: Uint8Array) {
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Float64Array <-> Float32Array
 ////////////////////////////////////////////////////////////////////////////////////////////
-export function float64ArrayTofloat32Array(float64s: Float64Array) {
+export function float64ArrayToFloat32Array(float64s: Float64Array) {
 	return Float32Array.from(float64s)
 }
 
-export function float32ArrayTofloat64Array(float32s: Float32Array) {
+export function float32ArrayToFloat64Array(float32s: Float32Array) {
 	return Float64Array.from(float32s)
 }
