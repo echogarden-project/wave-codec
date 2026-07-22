@@ -88,12 +88,15 @@ export function writeAscii(buffer: Uint8Array, asciiString: string, writeStartOf
 	let writeOffset = writeStartOffset
 
 	while (writeOffset < writeEndOffset) {
-		const charCode = asciiString.charCodeAt(readOffset++)
+		const charCode = asciiString.charCodeAt(readOffset)
 
 		if (charCode >= 128) {
-			throw new Error(`Character '${asciiString[readOffset]}' (code: ${charCode}) at offset ${readOffset} can't be encoded as ASCII`)
+			throw new Error(`Character '${String.fromCharCode(charCode)}' (code: ${charCode}) at offset ${readOffset} can't be encoded as ASCII`)
 		}
 
-		buffer[writeOffset++] = charCode
+		buffer[writeOffset] = charCode
+
+		readOffset++
+		writeOffset++
 	}
 }
