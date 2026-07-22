@@ -29,7 +29,7 @@ export function float32ChannelsToBuffer(audioChannels: Float32Array[], targetBit
 		if (targetBitDepth === 32) {
 			return BinaryArrayConversion.float32ArrayToBytesLE(interleavedChannels)
 		} else if (targetBitDepth === 64) {
-			return BinaryArrayConversion.float64ArrayToBytesLE(BinaryArrayConversion.float32ArrayTofloat64Array(interleavedChannels))
+			return BinaryArrayConversion.float64ArrayToBytesLE(BinaryArrayConversion.float32ArrayToFloat64Array(interleavedChannels))
 		} else {
 			throw new Error(`Unsupported float bit depth: ${targetBitDepth}`)
 		}
@@ -69,7 +69,7 @@ export function bufferToFloat32Channels(audioBuffer: Uint8Array, channelCount: n
 		if (sourceBitDepth === 32) {
 			interleavedChannels = BinaryArrayConversion.bytesLEToFloat32Array(audioBuffer)
 		} else if (sourceBitDepth === 64) {
-			interleavedChannels = BinaryArrayConversion.float64ArrayTofloat32Array(BinaryArrayConversion.bytesLEToFloat64Array(audioBuffer))
+			interleavedChannels = BinaryArrayConversion.float64ArrayToFloat32Array(BinaryArrayConversion.bytesLEToFloat64Array(audioBuffer))
 		} else {
 			throw new Error(`Unsupported float bit depth: ${sourceBitDepth}`)
 		}
@@ -255,7 +255,7 @@ export function deinterleaveChannels(interleavedChannels: Float32Array, channelC
 	}
 
 	if (interleavedChannels.length % channelCount !== 0) {
-		throw new Error(`Size of interleaved channels (${interleaveChannels.length}) is not a multiple of channel count (${channelCount})`)
+		throw new Error(`Size of interleaved channels (${interleavedChannels.length}) is not a multiple of channel count (${channelCount})`)
 	}
 
 	const sampleCount = interleavedChannels.length / channelCount
